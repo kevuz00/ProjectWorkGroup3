@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Progetto Flask</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="home-box">
+            <header>
+                <h1>Benvenuto, {{ username }}!</h1>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            </header>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <main>
+                <div class="content">
+                    <h2>Pagina Protetta</h2>
+                    <p>Questa è una pagina HTML statica accessibile solo dopo il login.</p>
+                    <p>Sei autenticato come: <strong>{{ username }}</strong></p>
+                    
+                    <div class="info-section">
+                        <h3>Informazioni</h3>
+                        <ul>
+                            <li>✓ Login effettuato con successo</li>
+                            <li>✓ Sessione attiva</li>
+                            <li>✓ Contenuto protetto visualizzabile</li>
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
