@@ -10,6 +10,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -23,10 +24,10 @@ class User(UserMixin, db.Model):
 # 🔧 CRUD Operations
 # -----------------------
 
-def create_user(username, password):
+def create_user(username, password, is_admin=False):
     """Create a new user with a hashed password."""
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-    new_user = User(username=username, password=hashed_password)
+    new_user = User(username=username, password=hashed_password, is_admin=is_admin)
     db.session.add(new_user)
     db.session.commit()
     return new_user

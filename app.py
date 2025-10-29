@@ -4,6 +4,7 @@ from model import db, bcrypt
 from model.user import User, create_user, get_user_by_username, get_user_by_id
 from model.log import Log, create_log, get_all_logs, get_error_logs
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = 'chiave-segreta-da-cambiare-in-produzione'
@@ -24,6 +25,22 @@ login_manager.login_message = 'Devi effettuare il login per accedere a questa pa
 @login_manager.user_loader
 def load_user(user_id):
     return get_user_by_id(user_id)
+
+
+def ensure_admin_user():
+    """Crea automaticamente l'utente admin se non esiste"""
+    admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+    admin_password = os.getenv('ADMIN_PASSWORD', 'Admin123!')
+    
+    admin = get_user_by_username(admin_username)
+    if not admin:
+        try:
+            create_user(admin_username, admin_password, is_admin=True)
+            print(f"✅ Utente admin '{admin_username}' creato automaticamente")
+        except Exception as e:
+            print(f"⚠️  Errore creazione admin: {e}")
+    else:
+        print(f"ℹ️  Utente admin '{admin_username}' già esistente")
 
 
 @app.route('/')
@@ -150,6 +167,11 @@ def logout():
 @login_required
 def logs():
     """Dashboard per visualizzare i log"""
+    # Solo admin può accedere
+    if not getattr(current_user, 'is_admin', False):
+        flash('Accesso negato: sezione riservata agli amministratori.', 'error')
+        return redirect(url_for('home'))
+    
     # 📝 LOG: Accesso alla pagina logs
     create_log(
         ip=request.remote_addr,
@@ -180,4 +202,5 @@ def logs():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        ensure_admin_user()  # Crea admin automaticamente
     app.run(debug=True)

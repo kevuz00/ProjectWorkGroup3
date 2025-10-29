@@ -21,6 +21,7 @@ with app.app_context():
     print("   - username (String(80), Unique)")
     print("   - password (String(200), Hashed)")
     print("   - created_at (DateTime)")
+    print("   - is_admin (Boolean)")
     print("\n📋 Struttura tabella Log:")
     print("   - id (Integer, Primary Key)")
     print("   - ip (String(45))")
@@ -28,4 +29,8 @@ with app.app_context():
     print("   - timestamp (DateTime)")
     print("   - is_error (Boolean)")
     print("   - user_id (Integer, Foreign Key)")
-    print("\n🎉 Database pronto! Ora puoi registrare nuovi utenti e verranno loggati tutti gli eventi.")
+    
+    print("\n🎉 Database pronto!")
+    print("\n� Per creare l'utente admin, esegui:")
+    print("   python create_admin.py")
+
