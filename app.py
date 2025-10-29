@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from model import db, bcrypt
 from model.user import User, create_user, get_user_by_username, get_user_by_id
 from model.log import Log, create_log, get_all_logs, get_error_logs
+from model.analyzer import SecurityAnalyzer
 from datetime import datetime
 import os
 
@@ -183,6 +184,9 @@ def logs():
     # Ottieni tutti i log (limitati agli ultimi 100)
     all_logs = get_all_logs()[:100]
     
+    # 🚨 ANALISI SICUREZZA - Rileva brute force e IP sospetti
+    alerts = SecurityAnalyzer.get_all_alerts()
+    
     # Statistiche base
     total_logs = len(all_logs)
     error_count = sum(1 for log in all_logs if log.is_error)
@@ -196,7 +200,7 @@ def logs():
         'login_failed': login_failed
     }
     
-    return render_template('logs.html', logs=all_logs, stats=stats)
+    return render_template('logs.html', logs=all_logs, stats=stats, alerts=alerts)
 
 
 if __name__ == '__main__':

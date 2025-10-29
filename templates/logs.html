@@ -12,6 +12,97 @@
             padding: 20px;
         }
         
+        .alerts-section {
+            margin-bottom: 30px;
+        }
+        
+        .alert-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .alert-box.critical {
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .alert-box.warning {
+            border-left: 5px solid #f39c12;
+        }
+        
+        .alert-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .alert-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .alert-badge.critical {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .alert-badge.warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .alert-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+        
+        .alert-item .message {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .alert-item .details {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .alert-item .ip-highlight {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .no-alerts {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -169,6 +260,56 @@
         </div>
         
         <h1>Security Logs Dashboard</h1>
+        
+        <!-- 🚨 SEZIONE ALERT -->
+        <div class="alerts-section">
+            {% if alerts.total_alerts > 0 %}
+                <!-- Alert Brute Force -->
+                {% if alerts.brute_force %}
+                <div class="alert-box critical">
+                    <div class="alert-header">
+                        <h3>🚨 Brute Force Rilevato</h3>
+                        <span class="alert-badge critical">CRITICAL</span>
+                    </div>
+                    {% for alert in alerts.brute_force %}
+                    <div class="alert-item">
+                        <div class="message">{{ alert.message }}</div>
+                        <div class="details">
+                            IP: <span class="ip-highlight">{{ alert.ip }}</span> | 
+                            Tentativi: <strong>{{ alert.attempts }}</strong> | 
+                            Finestra: {{ alert.time_window }} | 
+                            Ultimo tentativo: {{ alert.last_attempt.strftime('%d/%m/%Y %H:%M:%S') }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Alert IP Sospetti -->
+                {% if alerts.suspicious_ips %}
+                <div class="alert-box warning">
+                    <div class="alert-header">
+                        <h3>⚠️ IP Sospetti</h3>
+                        <span class="alert-badge warning">WARNING</span>
+                    </div>
+                    {% for alert in alerts.suspicious_ips %}
+                    <div class="alert-item">
+                        <div class="message">{{ alert.message }}</div>
+                        <div class="details">
+                            IP: <span class="ip-highlight">{{ alert.ip }}</span> | 
+                            Errori: <strong>{{ alert.error_count }}</strong> | 
+                            Finestra: {{ alert.time_window }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="no-alerts">
+                    ✅ Nessun alert di sicurezza rilevato - Sistema sicuro
+                </div>
+            {% endif %}
+        </div>
         
         <div class="stats-grid">
             <div class="stat-card">
