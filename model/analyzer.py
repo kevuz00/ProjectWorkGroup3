@@ -96,6 +96,58 @@ class SecurityAnalyzer:
         return {
             'brute_force': SecurityAnalyzer.detect_brute_force(),
             'suspicious_ips': SecurityAnalyzer.detect_suspicious_ips(),
+            'malicious_inputs': SecurityAnalyzer.detect_malicious_inputs(),
             'total_alerts': len(SecurityAnalyzer.detect_brute_force()) + 
-                          len(SecurityAnalyzer.detect_suspicious_ips())
+                          len(SecurityAnalyzer.detect_suspicious_ips()) +
+                          len(SecurityAnalyzer.detect_malicious_inputs())
         }
+    
+    @staticmethod
+    def detect_malicious_inputs(hours=24):
+        """
+        Rileva tentativi di input malevoli (SQL Injection, XSS, ecc.)
+        
+        Args:
+            hours: Finestra temporale in ore (default: 24)
+        
+        Returns:
+            Dizionario con statistiche per tipo di attacco
+        """
+        time_threshold = datetime.now() - timedelta(hours=hours)
+        
+        # Tipi di attacchi da cercare
+        attack_types = ['SQL_INJECTION', 'XSS', 'COMMAND_INJECTION', 'PATH_TRAVERSAL']
+        
+        results = {
+            'sql_injection': {'count': 0, 'ips': [], 'recent': []},
+            'xss': {'count': 0, 'ips': [], 'recent': []},
+            'command_injection': {'count': 0, 'ips': [], 'recent': []},
+            'path_traversal': {'count': 0, 'ips': [], 'recent': []}
+        }
+        
+        for attack_type in attack_types:
+            log_type = f'MALICIOUS_INPUT_{attack_type}'
+            
+            # Conta attacchi per tipo
+            logs = Log.query.filter(
+                Log.type == log_type,
+                Log.timestamp >= time_threshold
+            ).all()
+            
+            # Raggruppa per IP
+            ip_counts = {}
+            for log in logs:
+                if log.ip not in ip_counts:
+                    ip_counts[log.ip] = 0
+                ip_counts[log.ip] += 1
+            
+            # Organizza risultati
+            key = attack_type.lower()
+            results[key]['count'] = len(logs)
+            results[key]['ips'] = [
+                {'ip': ip, 'attempts': count} 
+                for ip, count in sorted(ip_counts.items(), key=lambda x: x[1], reverse=True)
+            ][:5]  # Top 5 IP
+            results[key]['recent'] = logs[:10]  # Ultimi 10 attacchi
+        
+        return results

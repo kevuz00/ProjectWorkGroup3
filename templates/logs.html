@@ -250,6 +250,125 @@
         .btn-nav.secondary:hover {
             background: #5a6268;
         }
+        
+        /* 🔍 STILI FILTRI */
+        .filters-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .filters-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-item label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        
+        .filter-item input,
+        .filter-item select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-item input:focus,
+        .filter-item select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-filter.apply {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-filter.apply:hover {
+            background: #5568d3;
+        }
+        
+        .btn-filter.reset {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-filter.reset:hover {
+            background: #d0d0d0;
+        }
+        
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            background: #e8eaf6;
+            color: #667eea;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .filter-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .filter-tag .remove:hover {
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
@@ -260,6 +379,122 @@
         </div>
         
         <h1>Security Logs Dashboard</h1>
+        
+        <!-- 🔍 FILTRI -->
+        <div class="filters-container">
+            <div class="filters-header">
+                <h3>🔍 Filtri Log</h3>
+                <span style="color: #999; font-size: 13px;">
+                    Mostrando {{ stats.total }} risultati
+                </span>
+            </div>
+            
+            <form method="GET" action="{{ url_for('logs') }}" id="filterForm">
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label for="type">Tipo Evento</label>
+                        <select name="type" id="type">
+                            <option value="">Tutti i tipi</option>
+                            {% for log_type in log_types %}
+                            <option value="{{ log_type }}" {% if filters.type == log_type %}selected{% endif %}>
+                                {{ log_type }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label for="ip">Indirizzo IP</label>
+                        <input type="text" 
+                               name="ip" 
+                               id="ip" 
+                               placeholder="es: 192.168.1.100" 
+                               value="{{ filters.ip }}">
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label for="user">Username</label>
+                        <input type="text" 
+                               name="user" 
+                               id="user" 
+                               placeholder="es: admin" 
+                               value="{{ filters.user }}">
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label for="error">Solo Errori</label>
+                        <select name="error" id="error">
+                            <option value="">Tutti</option>
+                            <option value="true" {% if filters.error == 'true' %}selected{% endif %}>
+                                Solo Errori
+                            </option>
+                            <option value="false" {% if filters.error == 'false' %}selected{% endif %}>
+                                Solo Successi
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label for="date">Data</label>
+                        <input type="date" 
+                               name="date" 
+                               id="date" 
+                               value="{{ filters.date }}">
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn-filter apply">🔍 Applica Filtri</button>
+                    <a href="{{ url_for('logs') }}" class="btn-filter reset">🔄 Reset</a>
+                </div>
+            </form>
+            
+            <!-- Quick Filters -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                <strong style="font-size: 13px; color: #666; display: block; margin-bottom: 8px;">⚡ Filtri Rapidi:</strong>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <a href="?error=true" class="filter-tag" style="text-decoration: none; cursor: pointer;">
+                        🔴 Solo Errori
+                    </a>
+                    <a href="?type=LOGIN_FAILED" class="filter-tag" style="text-decoration: none;">
+                        🚫 Login Falliti
+                    </a>
+                    <a href="?type=MALICIOUS_INPUT" class="filter-tag" style="text-decoration: none;">
+                        🛡️ Attacchi
+                    </a>
+                    <a href="?type=LOGIN_SUCCESS" class="filter-tag" style="text-decoration: none;">
+                        ✅ Login Riusciti
+                    </a>
+                    <a href="?type=PAGE_ACCESS" class="filter-tag" style="text-decoration: none;">
+                        📄 Accessi Pagine
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Filtri attivi -->
+            {% if filters.type or filters.ip or filters.user or filters.error or filters.date %}
+            <div class="active-filters">
+                <strong style="font-size: 13px; color: #666; margin-right: 10px;">Filtri attivi:</strong>
+                {% if filters.type %}
+                <span class="filter-tag">Tipo: {{ filters.type }}</span>
+                {% endif %}
+                {% if filters.ip %}
+                <span class="filter-tag">IP: {{ filters.ip }}</span>
+                {% endif %}
+                {% if filters.user %}
+                <span class="filter-tag">User: {{ filters.user }}</span>
+                {% endif %}
+                {% if filters.error == 'true' %}
+                <span class="filter-tag">Solo Errori</span>
+                {% elif filters.error == 'false' %}
+                <span class="filter-tag">Solo Successi</span>
+                {% endif %}
+                {% if filters.date %}
+                <span class="filter-tag">Data: {{ filters.date }}</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
         
         <!-- 🚨 SEZIONE ALERT -->
         <div class="alerts-section">
@@ -302,6 +537,88 @@
                         </div>
                     </div>
                     {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- 🛡️ Alert Attacchi Input Malevoli -->
+                {% if alerts.malicious_inputs %}
+                <div class="alert-box critical">
+                    <div class="alert-header">
+                        <h3>🛡️ Attacchi Rilevati (Ultime 24 ore)</h3>
+                        <span class="alert-badge critical">SECURITY</span>
+                    </div>
+                    
+                    <!-- SQL Injection -->
+                    {% if alerts.malicious_inputs.sql_injection.count > 0 %}
+                    <div class="alert-item">
+                        <div class="message">
+                            <strong>SQL Injection:</strong> {{ alerts.malicious_inputs.sql_injection.count }} tentativi rilevati
+                        </div>
+                        <div class="details">
+                            {% if alerts.malicious_inputs.sql_injection.ips %}
+                            IP più attivi: 
+                            {% for ip_data in alerts.malicious_inputs.sql_injection.ips[:3] %}
+                                <span class="ip-highlight">{{ ip_data.ip }}</span> ({{ ip_data.attempts }}x)
+                                {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- XSS -->
+                    {% if alerts.malicious_inputs.xss.count > 0 %}
+                    <div class="alert-item">
+                        <div class="message">
+                            <strong>XSS (Cross-Site Scripting):</strong> {{ alerts.malicious_inputs.xss.count }} tentativi rilevati
+                        </div>
+                        <div class="details">
+                            {% if alerts.malicious_inputs.xss.ips %}
+                            IP più attivi: 
+                            {% for ip_data in alerts.malicious_inputs.xss.ips[:3] %}
+                                <span class="ip-highlight">{{ ip_data.ip }}</span> ({{ ip_data.attempts }}x)
+                                {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Command Injection -->
+                    {% if alerts.malicious_inputs.command_injection.count > 0 %}
+                    <div class="alert-item">
+                        <div class="message">
+                            <strong>Command Injection:</strong> {{ alerts.malicious_inputs.command_injection.count }} tentativi rilevati
+                        </div>
+                        <div class="details">
+                            {% if alerts.malicious_inputs.command_injection.ips %}
+                            IP più attivi: 
+                            {% for ip_data in alerts.malicious_inputs.command_injection.ips[:3] %}
+                                <span class="ip-highlight">{{ ip_data.ip }}</span> ({{ ip_data.attempts }}x)
+                                {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Path Traversal -->
+                    {% if alerts.malicious_inputs.path_traversal.count > 0 %}
+                    <div class="alert-item">
+                        <div class="message">
+                            <strong>Path Traversal:</strong> {{ alerts.malicious_inputs.path_traversal.count }} tentativi rilevati
+                        </div>
+                        <div class="details">
+                            {% if alerts.malicious_inputs.path_traversal.ips %}
+                            IP più attivi: 
+                            {% for ip_data in alerts.malicious_inputs.path_traversal.ips[:3] %}
+                                <span class="ip-highlight">{{ ip_data.ip }}</span> ({{ ip_data.attempts }}x)
+                                {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
             {% else %}

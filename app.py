@@ -4,6 +4,7 @@ from model import db, bcrypt
 from model.user import User, create_user, get_user_by_username, get_user_by_id
 from model.log import Log, create_log, get_all_logs, get_error_logs
 from model.analyzer import SecurityAnalyzer
+from model.validator import InputValidator
 from datetime import datetime
 import os
 
@@ -59,6 +60,31 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        
+        # 🛡️ VALIDAZIONE INPUT - Controlla pattern malevoli
+        validation_username = InputValidator.validate(username, 'username')
+        validation_password = InputValidator.validate(password, 'password')
+        
+        # Se rileva attacco, logga e blocca
+        if not validation_username['is_safe']:
+            create_log(
+                ip=request.remote_addr,
+                log_type=f"MALICIOUS_INPUT_{validation_username['attack_type']}",
+                user=None,
+                is_error=True
+            )
+            flash('⚠️ Input sospetto rilevato. Tentativo bloccato per motivi di sicurezza.', 'danger')
+            return render_template('login.html')
+        
+        if not validation_password['is_safe']:
+            create_log(
+                ip=request.remote_addr,
+                log_type=f"MALICIOUS_INPUT_{validation_password['attack_type']}",
+                user=None,
+                is_error=True
+            )
+            flash('⚠️ Input sospetto rilevato. Tentativo bloccato per motivi di sicurezza.', 'danger')
+            return render_template('login.html')
 
         user = get_user_by_username(username)
 
@@ -99,6 +125,31 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+        
+        # 🛡️ VALIDAZIONE INPUT - Controlla pattern malevoli
+        validation_username = InputValidator.validate(username, 'username')
+        validation_password = InputValidator.validate(password, 'password')
+        
+        # Se rileva attacco, logga e blocca
+        if not validation_username['is_safe']:
+            create_log(
+                ip=request.remote_addr,
+                log_type=f"MALICIOUS_INPUT_{validation_username['attack_type']}",
+                user=None,
+                is_error=True
+            )
+            flash('⚠️ Input sospetto rilevato. Tentativo bloccato per motivi di sicurezza.', 'danger')
+            return render_template('register.html')
+        
+        if not validation_password['is_safe']:
+            create_log(
+                ip=request.remote_addr,
+                log_type=f"MALICIOUS_INPUT_{validation_password['attack_type']}",
+                user=None,
+                is_error=True
+            )
+            flash('⚠️ Input sospetto rilevato. Tentativo bloccato per motivi di sicurezza.', 'danger')
+            return render_template('register.html')
 
         # Validation
         if not username or not password:
@@ -167,27 +218,63 @@ def logout():
 @app.route('/logs')
 @login_required
 def logs():
-    """Dashboard per visualizzare i log"""
+    """Dashboard per visualizzare i log con filtri"""
     # Solo admin può accedere
     if not getattr(current_user, 'is_admin', False):
         flash('Accesso negato: sezione riservata agli amministratori.', 'error')
         return redirect(url_for('home'))
     
-    # 📝 LOG: Accesso alla pagina logs
-    create_log(
-        ip=request.remote_addr,
-        log_type="PAGE_ACCESS_LOGS",
-        user=current_user,
-        is_error=False
-    )
+    # 📝 LOG: Accesso alla pagina logs (solo se non è un refresh con filtri)
+    if not request.args:
+        create_log(
+            ip=request.remote_addr,
+            log_type="PAGE_ACCESS_LOGS",
+            user=current_user,
+            is_error=False
+        )
     
-    # Ottieni tutti i log (limitati agli ultimi 100)
-    all_logs = get_all_logs()[:100]
+    # 🔍 FILTRI dai parametri URL
+    filter_type = request.args.get('type', '')
+    filter_ip = request.args.get('ip', '')
+    filter_user = request.args.get('user', '')
+    filter_error = request.args.get('error', '')
+    filter_date = request.args.get('date', '')
+    
+    # Query base
+    query = Log.query
+    
+    # Applica filtri
+    if filter_type:
+        query = query.filter(Log.type.like(f'%{filter_type}%'))
+    
+    if filter_ip:
+        query = query.filter(Log.ip.like(f'%{filter_ip}%'))
+    
+    if filter_user:
+        query = query.join(User).filter(User.username.like(f'%{filter_user}%'))
+    
+    if filter_error == 'true':
+        query = query.filter(Log.is_error == True)
+    elif filter_error == 'false':
+        query = query.filter(Log.is_error == False)
+    
+    if filter_date:
+        from datetime import datetime, timedelta
+        try:
+            # Filtra per giorno specifico
+            target_date = datetime.strptime(filter_date, '%Y-%m-%d')
+            next_day = target_date + timedelta(days=1)
+            query = query.filter(Log.timestamp >= target_date, Log.timestamp < next_day)
+        except ValueError:
+            pass  # Data non valida, ignora filtro
+    
+    # Ordina per timestamp decrescente e limita risultati
+    all_logs = query.order_by(Log.timestamp.desc()).limit(200).all()
     
     # 🚨 ANALISI SICUREZZA - Rileva brute force e IP sospetti
     alerts = SecurityAnalyzer.get_all_alerts()
     
-    # Statistiche base
+    # Statistiche base (sui log filtrati)
     total_logs = len(all_logs)
     error_count = sum(1 for log in all_logs if log.is_error)
     login_success = sum(1 for log in all_logs if log.type == "LOGIN_SUCCESS")
@@ -200,7 +287,27 @@ def logs():
         'login_failed': login_failed
     }
     
-    return render_template('logs.html', logs=all_logs, stats=stats, alerts=alerts)
+    # Ottieni lista tipi di log unici per dropdown
+    all_log_types = db.session.query(Log.type).distinct().all()
+    log_types = sorted([t[0] for t in all_log_types])
+    
+    # Ottieni lista IP unici
+    all_ips = db.session.query(Log.ip).distinct().limit(50).all()
+    unique_ips = sorted([ip[0] for ip in all_ips])
+    
+    return render_template('logs.html', 
+                         logs=all_logs, 
+                         stats=stats, 
+                         alerts=alerts,
+                         log_types=log_types,
+                         unique_ips=unique_ips,
+                         filters={
+                             'type': filter_type,
+                             'ip': filter_ip,
+                             'user': filter_user,
+                             'error': filter_error,
+                             'date': filter_date
+                         })
 
 
 if __name__ == '__main__':
