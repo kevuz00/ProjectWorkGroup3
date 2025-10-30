@@ -5,6 +5,7 @@ from model.user import User, create_user, get_user_by_username, get_user_by_id
 from model.log import Log, create_log, get_all_logs, get_error_logs
 from model.analyzer import SecurityAnalyzer
 from model.validator import InputValidator
+from model.password_validator import PasswordValidator
 from datetime import datetime
 import os
 
@@ -138,12 +139,14 @@ def register():
             flash('Le password non corrispondono.', 'error')
             return render_template('register.html')
 
-        if len(password) < 6:
-            flash('La password deve essere di almeno 6 caratteri.', 'error')
-            return render_template('register.html')
-
         if get_user_by_username(username):
             flash('Username già esistente.', 'error')
+            return render_template('register.html')
+
+        # 🔒 VALIDAZIONE FORZA PASSWORD
+        password_validation = PasswordValidator.validate_strength(password, username)
+        if not password_validation['is_strong']:
+            flash('❌ La password non soddisfa i requisiti di sicurezza.', 'error')
             return render_template('register.html')
 
         # Create user
@@ -157,7 +160,7 @@ def register():
             is_error=False
         )
         
-        flash('Registrazione completata! Ora puoi effettuare il login.', 'success')
+        flash('✅ Registrazione completata! Password sicura accettata.', 'success')
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -325,9 +328,15 @@ def change_password():
         flash('Le nuove password non corrispondono.', 'error')
         return redirect(url_for('account'))
     
-    # Verifica lunghezza password
-    if len(new_password) < 6:
-        flash('La nuova password deve essere di almeno 6 caratteri.', 'error')
+    # 🔄 PREVENZIONE RIUSO PASSWORD - Verifica che la nuova sia diversa dalla vecchia
+    if current_user.check_password(new_password):
+        flash('❌ La nuova password deve essere diversa da quella attuale.', 'error')
+        return redirect(url_for('account'))
+    
+    # 🔒 VALIDAZIONE FORZA PASSWORD
+    password_validation = PasswordValidator.validate_strength(new_password, current_user.username)
+    if not password_validation['is_strong']:
+        flash('❌ La nuova password non soddisfa i requisiti di sicurezza.', 'error')
         return redirect(url_for('account'))
     
     # Aggiorna password
@@ -344,7 +353,7 @@ def change_password():
             is_error=False
         )
         
-        flash('Password cambiata con successo!', 'success')
+        flash('✅ Password cambiata con successo! Password sicura accettata.', 'success')
     except Exception as e:
         db.session.rollback()
         flash('Errore durante il cambio password.', 'error')
