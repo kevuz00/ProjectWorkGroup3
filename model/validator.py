@@ -153,6 +153,53 @@ class InputValidator:
         }
     
     @staticmethod
+    def validate_sql_only(input_string, field_name="input"):
+        """
+        Valida SOLO per SQL Injection (per login/register dove XSS/CMD non servono)
+        
+        Args:
+            input_string (str): Stringa da validare
+            field_name (str): Nome del campo (per logging)
+        
+        Returns:
+            dict: {
+                'is_safe': bool,
+                'attack_type': str | None,
+                'pattern_matched': str | None,
+                'field': str
+            }
+        """
+        if not input_string or not isinstance(input_string, str):
+            return {
+                'is_safe': True,
+                'attack_type': None,
+                'pattern_matched': None,
+                'field': field_name
+            }
+        
+        # Converti in uppercase per case-insensitive matching
+        input_upper = input_string.upper()
+        
+        # Check SOLO SQL Injection
+        for pattern in InputValidator.SQL_PATTERNS:
+            if re.search(pattern, input_upper, re.IGNORECASE):
+                return {
+                    'is_safe': False,
+                    'attack_type': 'SQL_INJECTION',
+                    'pattern_matched': pattern,
+                    'field': field_name,
+                    'input_sample': input_string[:100]
+                }
+        
+        # Nessun pattern SQL Injection trovato
+        return {
+            'is_safe': True,
+            'attack_type': None,
+            'pattern_matched': None,
+            'field': field_name
+        }
+    
+    @staticmethod
     def validate_multiple(fields_dict):
         """
         Valida multipli campi contemporaneamente

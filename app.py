@@ -61,25 +61,14 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        # 🛡️ VALIDAZIONE INPUT - Controlla pattern malevoli
-        validation_username = InputValidator.validate(username, 'username')
-        validation_password = InputValidator.validate(password, 'password')
+        # 🛡️ VALIDAZIONE BASE - Solo SQL Injection (XSS/CMD non servono nel login)
+        validation_username = InputValidator.validate_sql_only(username, 'username')
         
-        # Se rileva attacco, logga e blocca
+        # Se rileva SQL Injection, logga e blocca
         if not validation_username['is_safe']:
             create_log(
                 ip=request.remote_addr,
                 log_type=f"MALICIOUS_INPUT_{validation_username['attack_type']}",
-                user=None,
-                is_error=True
-            )
-            flash('⚠️ Input sospetto rilevato. Tentativo bloccato per motivi di sicurezza.', 'danger')
-            return render_template('login.html')
-        
-        if not validation_password['is_safe']:
-            create_log(
-                ip=request.remote_addr,
-                log_type=f"MALICIOUS_INPUT_{validation_password['attack_type']}",
                 user=None,
                 is_error=True
             )
@@ -126,25 +115,14 @@ def register():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         
-        # 🛡️ VALIDAZIONE INPUT - Controlla pattern malevoli
-        validation_username = InputValidator.validate(username, 'username')
-        validation_password = InputValidator.validate(password, 'password')
+        # 🛡️ VALIDAZIONE BASE - Solo SQL Injection (XSS/CMD non servono nel register)
+        validation_username = InputValidator.validate_sql_only(username, 'username')
         
-        # Se rileva attacco, logga e blocca
+        # Se rileva SQL Injection, logga e blocca
         if not validation_username['is_safe']:
             create_log(
                 ip=request.remote_addr,
                 log_type=f"MALICIOUS_INPUT_{validation_username['attack_type']}",
-                user=None,
-                is_error=True
-            )
-            flash('⚠️ Input sospetto rilevato. Tentativo bloccato per motivi di sicurezza.', 'danger')
-            return render_template('register.html')
-        
-        if not validation_password['is_safe']:
-            create_log(
-                ip=request.remote_addr,
-                log_type=f"MALICIOUS_INPUT_{validation_password['attack_type']}",
                 user=None,
                 is_error=True
             )
@@ -310,7 +288,128 @@ def logs():
                          })
 
 
+@app.route('/account')
+@login_required
+def account():
+    """Pagina gestione account utente"""
+    return render_template('account.html')
+
+
+@app.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    """Cambia la password dell'utente corrente"""
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    
+    # Validazione
+    if not current_password or not new_password or not confirm_password:
+        flash('Tutti i campi sono obbligatori.', 'error')
+        return redirect(url_for('account'))
+    
+    # Verifica password attuale
+    if not current_user.check_password(current_password):
+        # 📝 LOG: Tentativo cambio password con password errata
+        create_log(
+            ip=request.remote_addr,
+            log_type="PASSWORD_CHANGE_FAILED",
+            user=current_user,
+            is_error=True
+        )
+        flash('Password attuale non corretta.', 'error')
+        return redirect(url_for('account'))
+    
+    # Verifica corrispondenza nuova password
+    if new_password != confirm_password:
+        flash('Le nuove password non corrispondono.', 'error')
+        return redirect(url_for('account'))
+    
+    # Verifica lunghezza password
+    if len(new_password) < 6:
+        flash('La nuova password deve essere di almeno 6 caratteri.', 'error')
+        return redirect(url_for('account'))
+    
+    # Aggiorna password
+    try:
+        hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        current_user.password = hashed_password
+        db.session.commit()
+        
+        # 📝 LOG: Cambio password riuscito
+        create_log(
+            ip=request.remote_addr,
+            log_type="PASSWORD_CHANGE_SUCCESS",
+            user=current_user,
+            is_error=False
+        )
+        
+        flash('Password cambiata con successo!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Errore durante il cambio password.', 'error')
+    
+    return redirect(url_for('account'))
+
+
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    """Elimina l'account dell'utente corrente"""
+    
+    # Verifica che NON sia admin
+    if current_user.is_admin:
+        flash('Gli account amministratore non possono essere eliminati.', 'error')
+        return redirect(url_for('account'))
+    
+    password = request.form.get('password')
+    
+    # Verifica password
+    if not password or not current_user.check_password(password):
+        # 📝 LOG: Tentativo eliminazione account con password errata
+        create_log(
+            ip=request.remote_addr,
+            log_type="ACCOUNT_DELETE_FAILED",
+            user=current_user,
+            is_error=True
+        )
+        flash('Password non corretta. Eliminazione annullata.', 'error')
+        return redirect(url_for('account'))
+    
+    try:
+        # Salva username per il log
+        username = current_user.username
+        user_id = current_user.id
+        
+        # 📝 LOG: Account eliminato (prima di eliminare l'utente)
+        create_log(
+            ip=request.remote_addr,
+            log_type="ACCOUNT_DELETED",
+            user=current_user,
+            is_error=False
+        )
+        
+        # Logout prima di eliminare
+        logout_user()
+        
+        # Elimina l'utente
+        from model.user import User
+        user_to_delete = User.query.get(user_id)
+        if user_to_delete:
+            db.session.delete(user_to_delete)
+            db.session.commit()
+        
+        flash(f'Account "{username}" eliminato con successo.', 'success')
+        return redirect(url_for('login'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Errore durante l\'eliminazione dell\'account.', 'error')
+        return redirect(url_for('account'))
+
+
 if __name__ == '__main__':
+
     with app.app_context():
         db.create_all()
         ensure_admin_user()  # Crea admin automaticamente
