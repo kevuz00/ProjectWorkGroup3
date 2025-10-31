@@ -46,6 +46,52 @@
                     <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
                 </div>
                 
+                <!-- 📋 CHECKBOX GDPR OBBLIGATORIE -->
+                <div class="gdpr-section" style="margin: 25px 0; padding: 20px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px;">
+                    <h3 style="margin-top: 0; color: var(--primary, #f59e0b); font-size: 16px;">📋 Accettazione Obbligatoria</h3>
+                    
+                    <div class="checkbox-group" style="margin: 15px 0;">
+                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: var(--text, #e0e0e0);">
+                            <input type="checkbox" name="accept_privacy" id="accept_privacy" required 
+                                   style="margin-top: 3px; cursor: pointer; accent-color: var(--primary, #f59e0b);">
+                            <span style="flex: 1;">
+                                Ho letto e accetto l'<a href="{{ url_for('privacy_policy') }}" target="_blank" 
+                                style="color: var(--primary, #f59e0b); text-decoration: underline;">Informativa Privacy</a> 
+                                e autorizzo il trattamento dei miei dati personali ai sensi del GDPR (Regolamento UE 2016/679).
+                                <span style="color: #dc2626; font-weight: bold;">*</span>
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <div class="checkbox-group" style="margin: 15px 0;">
+                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: var(--text, #e0e0e0);">
+                            <input type="checkbox" name="accept_terms" id="accept_terms" required 
+                                   style="margin-top: 3px; cursor: pointer; accent-color: var(--primary, #f59e0b);">
+                            <span style="flex: 1;">
+                                Dichiaro di aver letto e accettato i <a href="{{ url_for('terms_conditions') }}" target="_blank" 
+                                style="color: var(--primary, #f59e0b); text-decoration: underline;">Termini e Condizioni d'Uso</a> 
+                                della piattaforma E-SHOP.
+                                <span style="color: #dc2626; font-weight: bold;">*</span>
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <div class="checkbox-group" style="margin: 15px 0;">
+                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: var(--text, #e0e0e0);">
+                            <input type="checkbox" name="confirm_age" id="confirm_age" required 
+                                   style="margin-top: 3px; cursor: pointer; accent-color: var(--primary, #f59e0b);">
+                            <span style="flex: 1;">
+                                Dichiaro di avere almeno <strong>18 anni</strong> e di essere maggiorenne secondo le leggi del mio Paese.
+                                <span style="color: #dc2626; font-weight: bold;">*</span>
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <p style="margin: 15px 0 0 0; font-size: 12px; color: var(--text-secondary, #b0b0b0);">
+                        <span style="color: #dc2626; font-weight: bold;">*</span> Campi obbligatori per completare la registrazione
+                    </p>
+                </div>
+                
                 <button type="submit" class="btn-login">Registrati</button>
             </form>
             

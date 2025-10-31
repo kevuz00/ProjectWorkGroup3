@@ -417,6 +417,18 @@ def delete_account():
         return redirect(url_for('account'))
 
 
+@app.route('/privacy-policy')
+def privacy_policy():
+    """Pagina Privacy Policy"""
+    return render_template('privacy_policy.html')
+
+
+@app.route('/terms-conditions')
+def terms_conditions():
+    """Pagina Termini e Condizioni"""
+    return render_template('terms_conditions.html')
+
+
 if __name__ == '__main__':
 
     with app.app_context():

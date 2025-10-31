@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Account - SIEM</title>
+    <title>Gestione Account - E-SHOP</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        body {
+            background: var(--bg, #121212);
+            color: var(--text, #e0e0e0);
+            min-height: 100vh;
+        }
+        
         .account-container {
-            max-width: 800px;
-            margin: 40px auto;
+            max-width: 900px;
+            margin: 0 auto;
             padding: 20px;
         }
         
         .account-header {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card, #1e1e1e);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
@@ -25,35 +32,42 @@
         
         .account-header h1 {
             margin: 0;
-            color: #333;
+            color: var(--text, #e0e0e0);
+            font-size: 28px;
         }
         
         .btn-back {
-            padding: 10px 20px;
-            background: #6c757d;
-            color: white;
+            padding: 12px 24px;
+            background: var(--card, #1e1e1e);
+            color: var(--text, #e0e0e0);
             text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
+            border-radius: 8px;
+            border: 1px solid var(--border, #333);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .btn-back:hover {
-            background: #5a6268;
+            background: #2a2a2a;
+            border-color: var(--primary, #f59e0b);
         }
         
         .account-section {
-            background: white;
+            background: var(--card, #1e1e1e);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
             margin-bottom: 20px;
         }
         
         .account-section h2 {
             margin-top: 0;
-            color: #333;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            color: var(--text, #e0e0e0);
+            border-bottom: 2px solid var(--primary, #f59e0b);
+            padding-bottom: 12px;
+            font-size: 22px;
         }
         
         .form-group {
@@ -62,81 +76,100 @@
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-secondary, #b0b0b0);
         }
         
         .form-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 12px;
+            background: var(--bg, #121212);
+            border: 1px solid var(--border, #333);
+            border-radius: 8px;
             font-size: 14px;
             box-sizing: border-box;
+            color: var(--text, #e0e0e0);
+            transition: border-color 0.3s;
         }
         
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary, #f59e0b);
         }
         
         .btn-primary {
             padding: 12px 30px;
-            background: #667eea;
-            color: white;
+            background: var(--primary, #f59e0b);
+            color: #000;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
         
         .btn-primary:hover {
-            background: #5568d3;
+            background: #ea8c00;
+            transform: translateY(-2px);
         }
         
         .btn-danger {
             padding: 12px 30px;
-            background: #e74c3c;
+            background: #dc2626;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
         
         .btn-danger:hover {
-            background: #c0392b;
+            background: #b91c1c;
+            transform: translateY(-2px);
         }
         
         .btn-danger:disabled {
-            background: #ccc;
+            background: #444;
             cursor: not-allowed;
+            transform: none;
         }
         
         .warning-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 5px;
-            padding: 15px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--primary, #f59e0b);
+            border-radius: 8px;
+            padding: 16px;
             margin-bottom: 20px;
         }
         
         .warning-box h4 {
             margin-top: 0;
-            color: #856404;
+            color: var(--primary, #f59e0b);
+        }
+        
+        .warning-box p {
+            color: var(--text-secondary, #b0b0b0);
         }
         
         .info-box {
-            background: #d1ecf1;
-            border: 1px solid #17a2b8;
-            border-radius: 5px;
-            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 16px;
             margin-bottom: 20px;
+        }
+        
+        .info-box h4 {
+            margin-top: 0;
+            color: #3b82f6;
+        }
+        
+        .info-box p {
+            color: var(--text-secondary, #b0b0b0);
         }
         
         .user-info {
@@ -147,36 +180,41 @@
         }
         
         .user-info-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 3px solid #667eea;
+            background: var(--bg, #121212);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary, #f59e0b);
         }
         
         .user-info-item strong {
             display: block;
-            color: #666;
+            color: var(--text-secondary, #b0b0b0);
             font-size: 12px;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
         .user-info-item span {
             font-size: 18px;
-            color: #333;
+            color: var(--text, #e0e0e0);
+            font-weight: 600;
         }
         
         .delete-confirmation {
             display: none;
-            background: #f8d7da;
-            border: 1px solid #e74c3c;
-            border-radius: 5px;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid #dc2626;
+            border-radius: 8px;
             padding: 20px;
             margin-top: 15px;
         }
         
         .delete-confirmation.active {
             display: block;
+        }
+        
+        .delete-confirmation h4 {
+            color: #dc2626;
         }
         
         .checkbox-group {
@@ -188,11 +226,24 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
+            color: var(--text, #e0e0e0);
         }
         
         .checkbox-group input[type="checkbox"] {
             width: auto;
             cursor: pointer;
+            accent-color: var(--primary, #f59e0b);
+        }
+        
+        /* Password Requirements */
+        .password-requirements {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        
+        .password-requirements div {
+            padding: 4px 0;
+            transition: color 0.3s;
         }
     </style>
 </head>
@@ -200,7 +251,10 @@
     <div class="account-container">
         <div class="account-header">
             <h1>⚙️ Gestione Account</h1>
-            <a href="{{ url_for('home') }}" class="btn-back">← Torna alla Home</a>
+            <a href="{{ url_for('home') }}" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                Torna alla Home
+            </a>
         </div>
         
         {% with messages = get_flashed_messages(with_categories=true) %}

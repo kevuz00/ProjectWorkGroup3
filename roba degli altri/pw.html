@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-SHOP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1c1c1c;
+      --nav-bg: rgba(24, 24, 24, 0.9);
+      --accent: #f5f5f5;
+      --muted: #aaa;
+      --primary: #f59e0b;
+      font-family: "Poppins", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--accent); font-family: "Poppins", sans-serif; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 40px;
+      background: var(--nav-bg);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand { font-weight: 800; font-size: 24px; letter-spacing: 1px; color: var(--primary); cursor: pointer; }
+
+    .search { flex: 1; max-width: 480px; margin: 0 40px; position: relative; }
+    .search i { position: absolute; left: 14px; top: 12px; color: #777; font-size: 16px; }
+    .nav input { width: 100%; padding: 10px 12px 10px 38px; border-radius: 999px; border: 1px solid #333; background: #1f1f1f; color: var(--accent); font-size: 15px; transition: all 0.2s ease; }
+    .nav input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(245,158,11,0.25); background: #262626; }
+
+    .actions { display: flex; align-items: center; gap: 16px; }
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 17px; display: flex; align-items: center; gap: 6px; color: var(--muted); padding: 8px 12px; border-radius: 10px; transition: all 0.25s ease; }
+    .icon-btn span { font-size: 15px; font-weight: 600; }
+    .icon-btn:hover { color: var(--primary); background: rgba(245,158,11,0.08); transform: translateY(-1px); }
+
+    @media (max-width: 900px) { .search { display: none; } .nav { padding: 14px 20px; } .brand { font-size: 20px; } }
+
+    .products { max-width: 1200px; margin: 60px auto; padding: 0 36px; }
+    .products h2 { text-align: center; font-size: 36px; margin-bottom: 30px; font-weight: 700; color: var(--primary); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+
+    .product-card { background: var(--card); border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 18px; text-align: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+    .product-img img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+    .product-card p { margin: 6px 0; color: var(--accent); }
+    .product-card strong { color: var(--primary); }
+
+    .add-to-cart-btn {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .add-to-cart-btn:hover { background: #e08b00; transform: scale(1.1); }
+
+    .login-section, .contacts-section { max-width: 400px; margin: 80px auto; padding: 30px; background: var(--card); border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); color: var(--accent); }
+    .login-section h2, .contacts-section h2 { text-align: center; margin-bottom: 20px; color: var(--primary); }
+    .login-section input { padding: 10px; border: 1px solid #333; border-radius: 8px; background: #1f1f1f; color: var(--accent); }
+    .login-section button { padding: 12px; border: none; border-radius: 8px; background: var(--primary); color: #000; cursor: pointer; font-weight: 600; transition: background 0.2s ease; }
+    .login-section button:hover { background: #e08b00; }
+    .contacts-section p { text-align: center; line-height: 1.6; color: var(--muted); }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="brand">E-SHOP</div>
+    <div class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Cerca prodotti..." id="searchBar" oninput="filterProducts()">
+    </div>
+    <div class="actions">
+      <button class="icon-btn" title="Contatti" onclick="scrollToContacts()">
+        <i class="fa-solid fa-envelope"></i><span>Contatti</span>
+      </button>
+      <button class="icon-btn" title="Accedi" onclick="window.open('login.html','_blank')">
+        <i class="fa-regular fa-user"></i><span>Accedi</span>
+      </button>
+      <button class="icon-btn" title="Carrello">
+        <i class="fa-solid fa-cart-shopping"></i>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="products">
+      <h2>Prodotti</h2>
+      <div class="grid" id="productGrid">
+
+        <div class="product-card" data-name="Maglietta Basic">
+          <div class="product-img"><img src="https://www.77onlineshop.de/$WS/77onlineshop/websale8_shop-77onlineshop/produkte/medien/bilder/normal/19125413.jpg" alt="Maglietta Basic"></div>
+          <p>Maglietta Basic</p><p><strong>€19.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Maglietta Basic')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Baggy Jeans">
+          <div class="product-img"><img src="https://image.hm.com/assets/hm/1a/db/1adb0736e63e945b2ae73f606c6717142d39b663.jpg?imwidth=2160" alt="Baggy Jeans"></div>
+          <p>Baggy Jeans</p><p><strong>€49.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Baggy Jeans')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Tacchi">
+          <div class="product-img"><img src="https://www.boutiquedeisogni.com/cdn/shop/products/1664521274f35dfe23483e71e4590f03825e0e44c0.jpg?v=1702848287" alt="Tacchi"></div>
+          <p>Tacchi</p><p><strong>€69.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Tacchi')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Giacca Invernale">
+          <div class="product-img"><img src="https://it.venum.com/cdn/shop/files/b8be6fa19511529649d0fe86694f0e1cd254cacd_VENUM_05518_005_G_1.jpg?v=1750165365" alt="Giacca Invernale"></div>
+          <p>Giacca Invernale</p><p><strong>€89.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Giacca Invernale')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Cuffie Wireless">
+          <div class="product-img"><img src="https://media-assets.wired.it/photos/68905ea66c13171192005671/2:3/w_800,h_1200,c_limit/cuffie%20wireless.jpg" alt="Cuffie Wireless"></div>
+          <p>Cuffie Wireless</p><p><strong>€59.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Cuffie Wireless')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Iphone">
+          <div class="product-img"><img src="https://media.ldlc.com/r1600/ld/products/00/06/27/51/LD0006275104.jpg" alt="Iphone"></div>
+          <p>Iphone</p><p><strong>€499.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Iphone')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Zaino Casual">
+          <div class="product-img"><img src="https://stimm.com/cdn/shop/files/the-north-face-zaino-borealis-classic-tnf-black-asphalt-grey1_c0c9e9aa-85ad-4b27-8708-28ab8d673e30.jpg?v=1738859877" alt="Zaino Casual"></div>
+          <p>Zaino Casual</p><p><strong>€39.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Zaino Casual')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+        <div class="product-card" data-name="Orologio Digitale">
+          <div class="product-img"><img src="https://www.joygioielli.com/cdn/shop/products/A158WEA-1EF-1_d8c6b4fd-83ad-4e95-a78e-ff4de55da26b.jpg?v=1742293824" alt="Orologio Digitale"></div>
+          <p>Orologio Digitale</p><p><strong>€129.99</strong></p>
+          <button class="add-to-cart-btn" onclick="addToCart('Orologio Digitale')" title="Aggiungi al carrello">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="contacts" class="contacts-section">
+      <h2>Contatti</h2>
+      <p>
+        Email: support@e-shop.it<br>
+        Telefono: +39 123 333 1111<br>
+        Indirizzo: Via Bigari 3, Bologna
+      </p>
+    </section>
+  </main>
+
+  <script>
+    function filterProducts(){
+      const input = document.getElementById('searchBar').value.toLowerCase();
+      document.querySelectorAll('.product-card').forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        card.style.display = name.includes(input) ? 'block' : 'none';
+      });
+    }
+
+    function scrollToContacts(){
+      document.getElementById('contacts').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function addToCart(productName) {
+      alert(productName + " è stato aggiunto al carrello!");
+    }
+  </script>
+</body>
+</html>

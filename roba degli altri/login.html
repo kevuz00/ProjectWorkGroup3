@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body class="min-h-screen">
+    <div class="login-card p-8 rounded-xl w-96">
+        <h1 class="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label for="username" class="block text-sm font-medium">Username:</label>
+                <input type="text" id="username" name="username" required 
+                       class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium">Password:</label>
+                <input type="password" id="password" name="password" required 
+                       class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
+            </div>
+            <button type="submit" 
+                    class="submit-btn">
+                Login
+            </button>
+        </form>
+        <p id="error-message" class="mt-4 text-center"></p>
+    </div>
+    <script src="logAdmin.js"></script>
+</body>
+</html>
