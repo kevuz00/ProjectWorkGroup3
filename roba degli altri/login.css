@@ -1,5 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&family=JetBrains+Mono:wght@300;400;600;700&family=Source+Code+Pro:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+@import url('shared.css');
+
+/* Estrazione del CSS inline presente in login.html */
+
+:root {
+  --bg: #121212;
+  --card: #1e1e1e;
+  --accent: #f5f5f5;
+  --muted: #999;
+  --primary: #f59e0b;
+  --btn-bg: var(--primary);
+  --btn-text: #000;
+  --border: #333;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: var(--accent);
+}
 
 /* Background + decorative blurred blobs */
 :root {
@@ -131,4 +154,9 @@ body::after {
 /* small screens */
 @media (max-width: 420px) {
   .login-card { margin: 4vh 1rem; width: calc(100% - 2rem); padding: 1.25rem; border-radius: 0.75rem; }
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.97);}
+  to {opacity: 1; transform: scale(1);}
 }

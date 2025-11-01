@@ -1,33 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="login.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-SHOP — Accedi</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="login.css">
 </head>
-<body class="min-h-screen">
-    <div class="login-card p-8 rounded-xl w-96">
-        <h1 class="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-        <form id="loginForm" class="space-y-4">
-            <div>
-                <label for="username" class="block text-sm font-medium">Username:</label>
-                <input type="text" id="username" name="username" required 
-                       class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
-            </div>
-            <div>
-                <label for="password" class="block text-sm font-medium">Password:</label>
-                <input type="password" id="password" name="password" required 
-                       class="mt-1 block w-full px-3 py-2 rounded-md shadow-sm">
-            </div>
-            <button type="submit" 
-                    class="submit-btn">
-                Login
-            </button>
-        </form>
-        <p id="error-message" class="mt-4 text-center"></p>
-    </div>
-    <script src="logAdmin.js"></script>
+
+<body>
+  <div class="card">
+    <h2 id="formTitle">Accedi</h2>
+
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Email" required>
+      <input id="password" type="password" placeholder="Password" required>
+      <button>Accedi</button>
+      <p>Non hai un account? <a href="#" onclick="switchForm('signup')">Registrati</a></p>
+    </form>
+
+    <form id="signupForm" style="display:none;">
+      <input type="text" placeholder="Nome" required>
+      <input type="text" placeholder="Cognome" required>
+      <input type="email" placeholder="Email" required>
+      <input type="password" placeholder="Crea password" required>
+      <button>Crea account</button>
+      <p>Hai già un account? <a href="#" onclick="switchForm('login')">Accedi</a></p>
+    </form>
+
+    <!-- msg area -->
+    <p id="loginMessage" class="muted" style="text-align:center;margin-top:8px;"></p>
+
+    <!-- include auth script -->
+    <script src="auth.js"></script>
+  </div>
+
+  <script>
+    function switchForm(type) {
+      const login = document.getElementById('loginForm');
+      const signup = document.getElementById('signupForm');
+      const title = document.getElementById('formTitle');
+      const loginTab = document.getElementById('loginTab');
+      const signupTab = document.getElementById('signupTab');
+
+      if (type === 'login') {
+        login.style.display = 'flex';
+        signup.style.display = 'none';
+        title.textContent = 'Accedi';
+        loginTab && loginTab.classList.add('active');
+        signupTab && signupTab.classList.remove('active');
+      } else {
+        login.style.display = 'none';
+        signup.style.display = 'flex';
+        title.textContent = 'Registrati';
+        signupTab && signupTab.classList.add('active');
+        loginTab && loginTab.classList.remove('active');
+      }
+    }
+  </script>
 </body>
 </html>

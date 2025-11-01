@@ -381,6 +381,63 @@ def terms_conditions():
     return render_template('terms_conditions.html')
 
 
+@app.route('/contatti', methods=['GET', 'POST'])
+@login_required
+def contatti():
+    """Pagina contatti con form validato per rilevare input malevoli"""
+    if request.method == 'POST':
+        nome = request.form.get('nome', '')
+        email = request.form.get('email', '')
+        messaggio = request.form.get('messaggio', '')
+        
+        # 🛡️ VALIDAZIONE COMPLETA di tutti i campi
+        fields_to_validate = {
+            'nome': nome,
+            'email': email,
+            'messaggio': messaggio
+        }
+        
+        malicious_detected = False
+        attack_types = []
+        
+        # Valida ogni campo per TUTTI i tipi di attacco
+        for field_name, field_value in fields_to_validate.items():
+            if field_value:  # Solo se il campo non è vuoto
+                validation = InputValidator.validate(field_value, field_name)
+                
+                if not validation['is_safe']:
+                    malicious_detected = True
+                    attack_type = validation['attack_type']
+                    attack_types.append(attack_type)
+                    
+                    # 📝 LOG: Input malevolo rilevato
+                    create_log(
+                        ip=request.remote_addr,
+                        log_type=f"MALICIOUS_INPUT_{attack_type}",
+                        user=current_user,
+                        is_error=True
+                    )
+        
+        # Se rilevato input malevolo, blocca e avvisa
+        if malicious_detected:
+            flash('⚠️ Input sospetto rilevato. Messaggio bloccato per motivi di sicurezza.', 'error')
+            return render_template('contatti.html')
+        
+        # Se tutto ok, conferma invio (simulato)
+        # 📝 LOG: Messaggio di contatto inviato con successo
+        create_log(
+            ip=request.remote_addr,
+            log_type="CONTACT_FORM_SUCCESS",
+            user=current_user,
+            is_error=False
+        )
+        
+        flash(f'✅ Grazie {nome}! Il tuo messaggio è stato inviato con successo. Ti risponderemo presto all\'indirizzo {email}.', 'success')
+        return redirect(url_for('contatti'))
+    
+    return render_template('contatti.html')
+
+
 if __name__ == '__main__':
 
     with app.app_context():

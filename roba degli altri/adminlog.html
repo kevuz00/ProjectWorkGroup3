@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accesso Amministratore</title>
+  <link rel="stylesheet" href="pw.css">
+</head>
+<body>
+  <div style="max-width:640px;margin:6vh auto;padding:2rem;">
+    <div class="bg-white" style="padding:1.5rem;">
+      <h2 style="color:#e2cfff;margin-top:0;">Area Sicurezza</h2>
+      <p style="color:#ffd6da;">
+        Questa pagina è solo per gli amministratori. Se sei uno di loro inserisci le credenziali qui sotto.
+      </p>
+
+      <form id="adminLoginForm" style="margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+        <input id="adminEmail" type="email" placeholder="Email admin" required style="padding:10px;border-radius:8px;background:#1f1f1f;border:1px solid #333;color:#fff;">
+        <input id="adminPassword" type="password" placeholder="Password" required style="padding:10px;border-radius:8px;background:#1f1f1f;border:1px solid #333;color:#fff;">
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button type="submit" class="btn">Accedi</button>
+          <button type="button" class="btn-ghost" onclick="window.location.href='pw.html'">Annulla</button>
+        </div>
+      </form>
+
+      <p id="adminMsg" class="muted" style="margin-top:0.75rem;"></p>
+    </div>
+  </div>
+
+  <script src="adminAuth.js"></script>
+</body>
+</html>

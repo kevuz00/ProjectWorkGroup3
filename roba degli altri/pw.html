@@ -4,83 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>E-SHOP</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root {
-      --bg: #121212;
-      --card: #1c1c1c;
-      --nav-bg: rgba(24, 24, 24, 0.9);
-      --accent: #f5f5f5;
-      --muted: #aaa;
-      --primary: #f59e0b;
-      font-family: "Poppins", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--accent); font-family: "Poppins", sans-serif; }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 40px;
-      background: var(--nav-bg);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: blur(10px);
-    }
-
-    .brand { font-weight: 800; font-size: 24px; letter-spacing: 1px; color: var(--primary); cursor: pointer; }
-
-    .search { flex: 1; max-width: 480px; margin: 0 40px; position: relative; }
-    .search i { position: absolute; left: 14px; top: 12px; color: #777; font-size: 16px; }
-    .nav input { width: 100%; padding: 10px 12px 10px 38px; border-radius: 999px; border: 1px solid #333; background: #1f1f1f; color: var(--accent); font-size: 15px; transition: all 0.2s ease; }
-    .nav input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(245,158,11,0.25); background: #262626; }
-
-    .actions { display: flex; align-items: center; gap: 16px; }
-    .icon-btn { background: none; border: none; cursor: pointer; font-size: 17px; display: flex; align-items: center; gap: 6px; color: var(--muted); padding: 8px 12px; border-radius: 10px; transition: all 0.25s ease; }
-    .icon-btn span { font-size: 15px; font-weight: 600; }
-    .icon-btn:hover { color: var(--primary); background: rgba(245,158,11,0.08); transform: translateY(-1px); }
-
-    @media (max-width: 900px) { .search { display: none; } .nav { padding: 14px 20px; } .brand { font-size: 20px; } }
-
-    .products { max-width: 1200px; margin: 60px auto; padding: 0 36px; }
-    .products h2 { text-align: center; font-size: 36px; margin-bottom: 30px; font-weight: 700; color: var(--primary); }
-
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
-
-    .product-card { background: var(--card); border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 18px; text-align: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
-    .product-img img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
-    .product-card p { margin: 6px 0; color: var(--accent); }
-    .product-card strong { color: var(--primary); }
-
-    .add-to-cart-btn {
-      margin-top: 10px;
-      padding: 10px;
-      background: var(--primary);
-      color: #000;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-    .add-to-cart-btn:hover { background: #e08b00; transform: scale(1.1); }
-
-    .login-section, .contacts-section { max-width: 400px; margin: 80px auto; padding: 30px; background: var(--card); border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); color: var(--accent); }
-    .login-section h2, .contacts-section h2 { text-align: center; margin-bottom: 20px; color: var(--primary); }
-    .login-section input { padding: 10px; border: 1px solid #333; border-radius: 8px; background: #1f1f1f; color: var(--accent); }
-    .login-section button { padding: 12px; border: none; border-radius: 8px; background: var(--primary); color: #000; cursor: pointer; font-weight: 600; transition: background 0.2s ease; }
-    .login-section button:hover { background: #e08b00; }
-    .contacts-section p { text-align: center; line-height: 1.6; color: var(--muted); }
-  </style>
+  <link rel="stylesheet" href="pw.css"> <!-- collegamento al CSS esterno -->
 </head>
 
 <body>
@@ -94,9 +19,17 @@
       <button class="icon-btn" title="Contatti" onclick="scrollToContacts()">
         <i class="fa-solid fa-envelope"></i><span>Contatti</span>
       </button>
-      <button class="icon-btn" title="Accedi" onclick="window.open('login.html','_blank')">
-        <i class="fa-regular fa-user"></i><span>Accedi</span>
+
+      <!-- Logout button -->
+      <button id="logoutBtn" class="icon-btn" title="Logout" aria-label="Logout">
+        <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
       </button>
+
+      <!-- SINGLE static Sicurezza button (no duplicates, handled by JS) -->
+      <button id="securityBtn" data-role="security" class="icon-btn" title="Sicurezza" aria-label="Sicurezza">
+        <i class="fa-solid fa-shield-halved"></i><span>Sicurezza</span>
+      </button>
+
       <button class="icon-btn" title="Carrello">
         <i class="fa-solid fa-cart-shopping"></i>
       </button>
@@ -202,5 +135,8 @@
       alert(productName + " è stato aggiunto al carrello!");
     }
   </script>
+
+  <!-- include pwAuth script to adjust header based on session -->
+  <script src="pwAuth.js"></script>
 </body>
 </html>

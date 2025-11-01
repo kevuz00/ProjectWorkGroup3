@@ -19,10 +19,10 @@
         
         <div class="actions">
             <!-- Link Contatti -->
-            <button class="icon-btn" title="Contatti" onclick="scrollToContacts()">
+            <a href="{{ url_for('contatti') }}" class="icon-btn" title="Contatti">
                 <i class="fa-solid fa-envelope"></i>
                 <span>Contatti</span>
-            </button>
+            </a>
             
             <!-- Link Account -->
             <a href="{{ url_for('account') }}" class="icon-btn" title="Account">
@@ -39,7 +39,7 @@
             {% endif %}
             
             <!-- Carrello (decorativo) -->
-            <button class="icon-btn" title="Carrello" onclick="alert('Carrello non ancora implementato!')">
+            <button class="icon-btn" title="Carrello" onclick="alert('Carrello non disponibile!')">
                 <i class="fa-solid fa-cart-shopping"></i>
             </button>
             
@@ -182,14 +182,9 @@
             });
         }
 
-        // Scroll alla sezione contatti
-        function scrollToContacts() {
-            document.getElementById('contacts').scrollIntoView({ behavior: 'smooth' });
-        }
-
         // Aggiungi al carrello (decorativo)
         function addToCart(productName) {
-            alert('✅ ' + productName + ' aggiunto al carrello!\n\n(Funzionalità carrello non ancora implementata)');
+            alert(productName + ' aggiunto al carrello!');
         }
     </script>
 </body>
