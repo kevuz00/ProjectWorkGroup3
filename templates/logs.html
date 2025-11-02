@@ -3,13 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Logs - SIEM</title>
+    <title>Security Logs - E-SHOP</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
+        body {
+            background: var(--bg, #121212);
+            color: var(--text, #e0e0e0);
+            min-height: 100vh;
+        }
+        
         .logs-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+        }
+        
+        .logs-header {
+            background: var(--card, #1e1e1e);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logs-header h1 {
+            margin: 0;
+            color: var(--text, #e0e0e0);
+            font-size: 28px;
+        }
+        
+        .logs-header .btn-back {
+            padding: 12px 24px;
+            background: var(--card, #1e1e1e);
+            color: var(--text, #e0e0e0);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border, #333);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logs-header .btn-back:hover {
+            background: #2a2a2a;
+            border-color: var(--primary, #f59e0b);
         }
         
         .alerts-section {
@@ -17,25 +60,25 @@
         }
         
         .alert-box {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card, #1e1e1e);
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
             overflow: hidden;
             margin-bottom: 20px;
         }
         
         .alert-box.critical {
-            border-left: 5px solid #e74c3c;
+            border-left: 4px solid #dc2626;
         }
         
         .alert-box.warning {
-            border-left: 5px solid #f39c12;
+            border-left: 4px solid var(--primary, #f59e0b);
         }
         
         .alert-header {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e0e0e0;
+            background: rgba(30, 30, 30, 0.5);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border, #333);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,31 +86,31 @@
         
         .alert-header h3 {
             margin: 0;
-            color: #333;
+            color: var(--text, #e0e0e0);
             font-size: 16px;
         }
         
         .alert-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
         }
         
         .alert-badge.critical {
-            background: #e74c3c;
+            background: #dc2626;
             color: white;
         }
         
         .alert-badge.warning {
-            background: #f39c12;
-            color: white;
+            background: var(--primary, #f59e0b);
+            color: #000;
         }
         
         .alert-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border, #333);
         }
         
         .alert-item:last-child {
@@ -76,87 +119,104 @@
         
         .alert-item .message {
             font-size: 14px;
-            color: #333;
+            color: var(--text, #e0e0e0);
             margin-bottom: 8px;
         }
         
         .alert-item .details {
             font-size: 12px;
-            color: #666;
+            color: var(--text-secondary, #b0b0b0);
         }
         
         .alert-item .ip-highlight {
             font-family: 'Courier New', monospace;
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: #e74c3c;
+            background: rgba(220, 38, 38, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #ef4444;
             font-weight: 600;
         }
         
         .no-alerts {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px 20px;
-            border-radius: 8px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            padding: 16px 20px;
+            border-radius: 12px;
             text-align: center;
-            border: 1px solid #c3e6cb;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
         
         .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card, #1e1e1e);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
             text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary, #f59e0b);
         }
         
         .stat-card h3 {
-            margin: 0 0 10px 0;
-            color: #667eea;
-            font-size: 14px;
+            margin: 0 0 12px 0;
+            color: var(--primary, #f59e0b);
+            font-size: 13px;
             text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
         
         .stat-card .number {
-            font-size: 36px;
+            font-size: 40px;
             font-weight: bold;
-            color: #333;
+            color: var(--text, #e0e0e0);
+        }
+        
+        .stat-card.error h3 {
+            color: #ef4444;
         }
         
         .stat-card.error .number {
-            color: #e74c3c;
+            color: #ef4444;
+        }
+        
+        .stat-card.success h3 {
+            color: #4ade80;
         }
         
         .stat-card.success .number {
-            color: #27ae60;
+            color: #4ade80;
         }
         
         .logs-table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card, #1e1e1e);
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
             overflow: hidden;
         }
         
-        .logs-header {
+        .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            border-bottom: 2px solid #f0f0f0;
+            padding: 20px 24px;
+            border-bottom: 2px solid var(--border, #333);
         }
         
-        .logs-header h2 {
+        .table-header h2 {
             margin: 0;
-            color: #333;
+            color: var(--text, #e0e0e0);
+            font-size: 20px;
         }
         
         table {
@@ -165,98 +225,81 @@
         }
         
         thead {
-            background: #f8f9fa;
+            background: rgba(30, 30, 30, 0.5);
         }
         
         th {
-            padding: 15px;
+            padding: 16px;
             text-align: left;
             font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #e0e0e0;
+            color: var(--primary, #f59e0b);
+            border-bottom: 2px solid var(--border, #333);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border, #333);
+            color: var(--text-secondary, #b0b0b0);
+        }
+        
+        tbody tr {
+            transition: background 0.2s;
         }
         
         tbody tr:hover {
-            background: #f8f9fa;
+            background: rgba(245, 158, 11, 0.05);
         }
         
         .log-type {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
         
         .log-type.success {
-            background: #d4edda;
-            color: #155724;
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
         }
         
         .log-type.error {
-            background: #f8d7da;
-            color: #721c24;
+            background: rgba(220, 38, 38, 0.2);
+            color: #ef4444;
         }
         
         .log-type.info {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
         }
         
         .timestamp {
-            color: #666;
+            color: var(--text-secondary, #b0b0b0);
             font-size: 13px;
         }
         
         .ip-address {
             font-family: 'Courier New', monospace;
-            color: #667eea;
+            color: var(--primary, #f59e0b);
+            font-weight: 500;
         }
         
         .username {
             font-weight: 600;
-            color: #333;
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .btn-nav {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        
-        .btn-nav:hover {
-            background: #5568d3;
-        }
-        
-        .btn-nav.secondary {
-            background: #6c757d;
-        }
-        
-        .btn-nav.secondary:hover {
-            background: #5a6268;
+            color: var(--text, #e0e0e0);
         }
         
         /* 🔍 STILI FILTRI */
         .filters-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
+            background: var(--card, #1e1e1e);
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
+            padding: 24px;
             margin-bottom: 30px;
         }
         
@@ -264,20 +307,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .filters-header h3 {
             margin: 0;
-            color: #333;
+            color: var(--text, #e0e0e0);
             font-size: 18px;
         }
         
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
         
         .filter-item {
@@ -288,35 +331,38 @@
         .filter-item label {
             font-size: 13px;
             font-weight: 600;
-            color: #555;
-            margin-bottom: 5px;
+            color: var(--text-secondary, #b0b0b0);
+            margin-bottom: 8px;
         }
         
         .filter-item input,
         .filter-item select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 10px 12px;
+            border: 1px solid var(--border, #333);
+            border-radius: 8px;
             font-size: 14px;
             transition: border-color 0.3s;
+            background: var(--bg, #121212);
+            color: var(--text, #e0e0e0);
         }
         
         .filter-item input:focus,
         .filter-item select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary, #f59e0b);
         }
         
         .filter-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: flex-end;
+            margin-top: 10px;
         }
         
         .btn-filter {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -324,38 +370,42 @@
         }
         
         .btn-filter.apply {
-            background: #667eea;
-            color: white;
+            background: var(--primary, #f59e0b);
+            color: #000;
         }
         
         .btn-filter.apply:hover {
-            background: #5568d3;
+            background: #ea8c00;
+            transform: translateY(-2px);
         }
         
         .btn-filter.reset {
-            background: #e0e0e0;
-            color: #333;
+            background: var(--card, #1e1e1e);
+            color: var(--text, #e0e0e0);
+            border: 1px solid var(--border, #333);
         }
         
         .btn-filter.reset:hover {
-            background: #d0d0d0;
+            background: #2a2a2a;
+            border-color: var(--primary, #f59e0b);
         }
         
         .active-filters {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .filter-tag {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 5px 12px;
-            background: #e8eaf6;
-            color: #667eea;
-            border-radius: 15px;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--primary, #f59e0b);
+            border-radius: 16px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
             font-size: 12px;
             font-weight: 600;
         }
@@ -367,24 +417,405 @@
         }
         
         .filter-tag .remove:hover {
-            color: #e74c3c;
+            color: #ef4444;
+        }
+        
+        /* 📊 GRAFICI */
+        .charts-section {
+            margin: 30px 0;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: var(--card, #1e1e1e);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
+        }
+        
+        .chart-card h3 {
+            color: var(--text, #e0e0e0);
+            margin: 0 0 20px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chart-card h3 i {
+            color: var(--primary, #f59e0b);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 📋 LEGENDA LOG TYPES */
+        .legend-section {
+            margin: 30px 0;
+        }
+        
+        .legend-card {
+            background: var(--card, #1e1e1e);
+            border-radius: 12px;
+            border: 1px solid var(--border, #333);
+            overflow: hidden;
+        }
+        
+        .legend-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            user-select: none;
+        }
+        
+        .legend-header:hover {
+            background: rgba(245, 158, 11, 0.05);
+        }
+        
+        .legend-header h3 {
+            margin: 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text, #e0e0e0);
+        }
+        
+        .legend-header h3 i {
+            color: var(--primary, #f59e0b);
+        }
+        
+        .legend-toggle {
+            font-size: 20px;
+            color: var(--primary, #f59e0b);
+            transition: transform 0.3s ease;
+        }
+        
+        .legend-toggle.open {
+            transform: rotate(180deg);
+        }
+        
+        .legend-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        
+        .legend-content.open {
+            max-height: 2000px;
+        }
+        
+        .legend-body {
+            padding: 0 24px 24px 24px;
+        }
+        
+        .legend-category {
+            margin-bottom: 24px;
+        }
+        
+        .legend-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-category-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary, #f59e0b);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            min-height: 60px;
+        }
+        
+        .legend-item:hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--primary, #f59e0b);
+            transform: translateX(4px);
+        }
+        
+        .legend-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .legend-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .legend-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text, #e0e0e0);
+            margin-bottom: 3px;
+            line-height: 1.3;
+            word-wrap: break-word;
+        }
+        
+        .legend-desc {
+            font-size: 11px;
+            color: var(--text-secondary, #b0b0b0);
+        }
+        
+        .legend-count {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--primary, #f59e0b);
+            min-width: 35px;
+            text-align: center;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        /* Colori specifici per categoria */
+        .legend-item.success .legend-icon { color: #10b981; }
+        .legend-item.error .legend-icon { color: #ef4444; }
+        .legend-item.warning .legend-icon { color: #f59e0b; }
+        .legend-item.info .legend-icon { color: #3b82f6; }
+        .legend-item.danger .legend-icon { color: #dc2626; }
+        
+        @media (max-width: 768px) {
+            .legend-items {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="logs-container">
-        <div class="nav-buttons">
-            <a href="{{ url_for('home') }}" class="btn-nav secondary">← Torna alla Home</a>
-            <a href="{{ url_for('logout') }}" class="btn-nav">Logout</a>
+        <!-- HEADER CON BOTTONE BACK -->
+        <div class="logs-header">
+            <h1>🛡️ Security Logs Dashboard</h1>
+            <a href="{{ url_for('home') }}" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i>
+                Torna alla Home
+            </a>
         </div>
         
-        <h1>Security Logs Dashboard</h1>
+        <!-- � LEGENDA TIPI DI LOG -->
+        <div class="legend-section">
+            <div class="legend-card">
+                <div class="legend-header" onclick="toggleLegend()">
+                    <h3>
+                        <i class="fa-solid fa-book"></i>
+                        Legenda Tipi di Log
+                        <span style="font-size: 12px; font-weight: 400; color: var(--text-secondary, #b0b0b0); margin-left: 8px;">
+                            (Click per espandere/comprimere)
+                        </span>
+                    </h3>
+                    <i class="fa-solid fa-chevron-down legend-toggle" id="legendToggle"></i>
+                </div>
+                
+                <div class="legend-content" id="legendContent">
+                    <div class="legend-body">
+                        <!-- 🔐 Autenticazione -->
+                        <div class="legend-category">
+                            <div class="legend-category-title">🔐 Autenticazione</div>
+                            <div class="legend-items">
+                                <a href="?type=LOGIN_SUCCESS" class="legend-item success">
+                                    <i class="fa-solid fa-circle-check legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">LOGIN_SUCCESS</div>
+                                        <div class="legend-desc">Login effettuato con successo</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('LOGIN_SUCCESS', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=LOGIN_FAILED" class="legend-item error">
+                                    <i class="fa-solid fa-circle-xmark legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">LOGIN_FAILED</div>
+                                        <div class="legend-desc">Tentativo di login fallito</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('LOGIN_FAILED', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=LOGOUT" class="legend-item info">
+                                    <i class="fa-solid fa-right-from-bracket legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">LOGOUT</div>
+                                        <div class="legend-desc">Logout effettuato</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('LOGOUT', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=REGISTER_SUCCESS" class="legend-item success">
+                                    <i class="fa-solid fa-user-plus legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">REGISTER_SUCCESS</div>
+                                        <div class="legend-desc">Registrazione completata</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('REGISTER_SUCCESS', 0) }}</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 👤 Gestione Account -->
+                        <div class="legend-category">
+                            <div class="legend-category-title">👤 Gestione Account</div>
+                            <div class="legend-items">
+                                <a href="?type=PASSWORD_CHANGE_SUCCESS" class="legend-item success">
+                                    <i class="fa-solid fa-key legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">PASSWORD_CHANGE_SUCCESS</div>
+                                        <div class="legend-desc">Password modificata con successo</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('PASSWORD_CHANGE_SUCCESS', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=PASSWORD_CHANGE_FAILED" class="legend-item error">
+                                    <i class="fa-solid fa-lock legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">PASSWORD_CHANGE_FAILED</div>
+                                        <div class="legend-desc">Tentativo di cambio password fallito</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('PASSWORD_CHANGE_FAILED', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=ACCOUNT_DELETED" class="legend-item warning">
+                                    <i class="fa-solid fa-user-xmark legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">ACCOUNT_DELETED</div>
+                                        <div class="legend-desc">Account eliminato dall'utente</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('ACCOUNT_DELETED', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=ACCOUNT_DELETE_FAILED" class="legend-item error">
+                                    <i class="fa-solid fa-ban legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">ACCOUNT_DELETE_FAILED</div>
+                                        <div class="legend-desc">Tentativo fallito di eliminazione account</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('ACCOUNT_DELETE_FAILED', 0) }}</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 📄 Accesso Pagine -->
+                        <div class="legend-category">
+                            <div class="legend-category-title">📄 Accesso Pagine</div>
+                            <div class="legend-items">
+                                <a href="?type=PAGE_ACCESS" class="legend-item info">
+                                    <i class="fa-solid fa-house legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">PAGE_ACCESS</div>
+                                        <div class="legend-desc">Accesso alla home page</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('PAGE_ACCESS', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=PAGE_ACCESS_LOGS" class="legend-item info">
+                                    <i class="fa-solid fa-shield-halved legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">PAGE_ACCESS_LOGS</div>
+                                        <div class="legend-desc">Accesso alla dashboard log (admin)</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('PAGE_ACCESS_LOGS', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=CONTACT_FORM_SUCCESS" class="legend-item success">
+                                    <i class="fa-solid fa-envelope legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">CONTACT_FORM_SUCCESS</div>
+                                        <div class="legend-desc">Messaggio di contatto inviato</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('CONTACT_FORM_SUCCESS', 0) }}</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- 🚨 Attacchi di Sicurezza -->
+                        <div class="legend-category">
+                            <div class="legend-category-title">🚨 Attacchi di Sicurezza Rilevati</div>
+                            <div class="legend-items">
+                                <a href="?type=MALICIOUS_INPUT_SQL_INJECTION" class="legend-item danger">
+                                    <i class="fa-solid fa-database legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">MALICIOUS_INPUT_SQL_INJECTION</div>
+                                        <div class="legend-desc">Tentativo di SQL Injection bloccato</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('MALICIOUS_INPUT_SQL_INJECTION', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=MALICIOUS_INPUT_XSS" class="legend-item danger">
+                                    <i class="fa-solid fa-code legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">MALICIOUS_INPUT_XSS</div>
+                                        <div class="legend-desc">Tentativo di Cross-Site Scripting bloccato</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('MALICIOUS_INPUT_XSS', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=MALICIOUS_INPUT_COMMAND_INJECTION" class="legend-item danger">
+                                    <i class="fa-solid fa-terminal legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">MALICIOUS_INPUT_COMMAND_INJECTION</div>
+                                        <div class="legend-desc">Tentativo di Command Injection bloccato</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('MALICIOUS_INPUT_COMMAND_INJECTION', 0) }}</span>
+                                </a>
+                                
+                                <a href="?type=MALICIOUS_INPUT_PATH_TRAVERSAL" class="legend-item danger">
+                                    <i class="fa-solid fa-folder-tree legend-icon"></i>
+                                    <div class="legend-info">
+                                        <div class="legend-name">MALICIOUS_INPUT_PATH_TRAVERSAL</div>
+                                        <div class="legend-desc">Tentativo di Path Traversal bloccato</div>
+                                    </div>
+                                    <span class="legend-count">{{ log_type_counts.get('MALICIOUS_INPUT_PATH_TRAVERSAL', 0) }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         
-        <!-- 🔍 FILTRI -->
+        <!-- �🔍 FILTRI -->
         <div class="filters-container">
             <div class="filters-header">
                 <h3>🔍 Filtri Log</h3>
-                <span style="color: #999; font-size: 13px;">
+                <span style="color: var(--text-secondary, #b0b0b0); font-size: 13px;">
                     Mostrando {{ stats.total }} risultati
                 </span>
             </div>
@@ -650,6 +1081,35 @@
             </div>
         </div>
         
+        <!-- 📊 SEZIONE GRAFICI -->
+        <div class="charts-section">
+            <div class="charts-grid">
+                <!-- Grafico: Distribuzione Tipi di Log -->
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Distribuzione Tipi di Log</h3>
+                    <div class="chart-container">
+                        <canvas id="logTypesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Grafico: Top IP Attivi -->
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-network-wired"></i> Top 10 IP più Attivi</h3>
+                    <div class="chart-container">
+                        <canvas id="topIPsChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Grafico: Attività per Ora -->
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-clock"></i> Attività per Ora del Giorno</h3>
+                    <div class="chart-container">
+                        <canvas id="activityByHourChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="logs-table-container">
             <div class="logs-header">
                 <h2>Ultimi 100 Eventi</h2>
@@ -697,5 +1157,181 @@
             </table>
         </div>
     </div>
+    
+    <script>
+        // 📊 CONFIGURAZIONE GLOBALE CHART.JS (Dark Theme)
+        Chart.defaults.color = '#e0e0e0';
+        Chart.defaults.borderColor = '#333';
+        Chart.defaults.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+        
+        // Prepara i dati dai log Flask (già serializzati in JSON)
+        const logs = {{ logs_json | tojson | safe }};
+        
+        // 1️⃣ GRAFICO: Distribuzione Tipi di Log (Pie Chart)
+        const logTypeCount = {};
+        logs.forEach(log => {
+            logTypeCount[log.type] = (logTypeCount[log.type] || 0) + 1;
+        });
+        
+        const sortedTypes = Object.entries(logTypeCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8); // Top 8 tipi
+        
+        new Chart(document.getElementById('logTypesChart'), {
+            type: 'doughnut',
+            data: {
+                labels: sortedTypes.map(t => t[0]),
+                datasets: [{
+                    data: sortedTypes.map(t => t[1]),
+                    backgroundColor: [
+                        '#f59e0b', // Arancione
+                        '#3b82f6', // Blu
+                        '#10b981', // Verde
+                        '#ef4444', // Rosso
+                        '#8b5cf6', // Viola
+                        '#ec4899', // Rosa
+                        '#14b8a6', // Teal
+                        '#f97316'  // Arancione scuro
+                    ],
+                    borderColor: '#1e1e1e',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { color: '#e0e0e0', padding: 12, font: { size: 11 } }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e1e1e',
+                        titleColor: '#f59e0b',
+                        bodyColor: '#e0e0e0',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true
+                    }
+                }
+            }
+        });
+        
+        // 2️⃣ GRAFICO: Top 10 IP più Attivi (Horizontal Bar)
+        const ipCount = {};
+        logs.forEach(log => {
+            ipCount[log.ip] = (ipCount[log.ip] || 0) + 1;
+        });
+        
+        const topIPs = Object.entries(ipCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+        
+        new Chart(document.getElementById('topIPsChart'), {
+            type: 'bar',
+            data: {
+                labels: topIPs.map(ip => ip[0]),
+                datasets: [{
+                    label: 'Richieste',
+                    data: topIPs.map(ip => ip[1]),
+                    backgroundColor: '#f59e0b',
+                    borderColor: '#d97706',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: '#333' },
+                        ticks: { color: '#e0e0e0', precision: 0 }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#e0e0e0', font: { size: 10 } }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e1e1e',
+                        titleColor: '#f59e0b',
+                        bodyColor: '#e0e0e0',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                }
+            }
+        });
+        
+        // 3️⃣ GRAFICO: Attività per Ora del Giorno (Line Chart)
+        const hourCount = Array(24).fill(0);
+        logs.forEach(log => {
+            const hour = new Date(log.timestamp).getHours();
+            hourCount[hour]++;
+        });
+        
+        new Chart(document.getElementById('activityByHourChart'), {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                datasets: [{
+                    label: 'Eventi per Ora',
+                    data: hourCount,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#1e1e1e',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#333' },
+                        ticks: { color: '#e0e0e0', precision: 0 }
+                    },
+                    x: {
+                        grid: { color: 'rgba(51, 51, 51, 0.3)' },
+                        ticks: { color: '#e0e0e0', maxRotation: 45, minRotation: 0 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e1e1e',
+                        titleColor: '#f59e0b',
+                        bodyColor: '#e0e0e0',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                }
+            }
+        });
+        
+        // 📋 TOGGLE LEGENDA
+        function toggleLegend() {
+            const content = document.getElementById('legendContent');
+            const toggle = document.getElementById('legendToggle');
+            
+            content.classList.toggle('open');
+            toggle.classList.toggle('open');
+        }
+    </script>
 </body>
 </html>

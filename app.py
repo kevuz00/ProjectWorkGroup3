@@ -249,8 +249,26 @@ def logs():
     all_ips = db.session.query(Log.ip).distinct().limit(50).all()
     unique_ips = sorted([ip[0] for ip in all_ips])
     
+    # 📊 Converti i log in dizionari JSON-serializzabili per i grafici
+    logs_json = []
+    for log in all_logs:
+        logs_json.append({
+            'id': log.id,
+            'timestamp': log.timestamp.isoformat(),
+            'type': log.type,
+            'ip': log.ip,
+            'is_error': log.is_error,
+            'user': log.user.username if log.user else None
+        })
+    
+    # 📋 Calcola conteggio per tipo di log per la legenda
+    from collections import Counter
+    log_type_counts = Counter(log.type for log in all_logs)
+    
     return render_template('logs.html', 
-                         logs=all_logs, 
+                         logs=all_logs,
+                         logs_json=logs_json,
+                         log_type_counts=log_type_counts,
                          stats=stats, 
                          alerts=alerts,
                          log_types=log_types,
