@@ -456,6 +456,30 @@ def contatti():
     return render_template('contatti.html')
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    """Gestisce errori 404 - Pagina non trovata"""
+    create_log(
+        ip=request.remote_addr,
+        log_type="PAGE_NOT_FOUND",
+        user=current_user if current_user.is_authenticated else None,
+        is_error=True
+    )
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    """Gestisce errori 500 - Errore interno del server"""
+    create_log(
+        ip=request.remote_addr,
+        log_type="INTERNAL_SERVER_ERROR",
+        user=current_user if current_user.is_authenticated else None,
+        is_error=True
+    )
+    return render_template('500.html'), 500
+
+
 if __name__ == '__main__':
 
     with app.app_context():
