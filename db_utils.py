@@ -70,7 +70,7 @@ def clear_logs():
 def menu():
     """Menu interattivo"""
     print("\n" + "="*60)
-    print("🔧 UTILITY DATABASE SIEM")
+    print("UTILITY DATABASE SIEM")
     print("="*60)
     print("1. Mostra utenti")
     print("2. Mostra ultimi 20 log")

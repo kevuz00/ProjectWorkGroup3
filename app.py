@@ -9,7 +9,7 @@ from model.password_validator import PasswordValidator
 import os
 
 app = Flask(__name__)
-app.secret_key = 'chiave-segreta-da-cambiare-in-produzione'
+app.secret_key = 'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef12345678'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -249,7 +249,7 @@ def logs():
     all_ips = db.session.query(Log.ip).distinct().limit(50).all()
     unique_ips = sorted([ip[0] for ip in all_ips])
     
-    # 📊 Converti i log in dizionari JSON-serializzabili per i grafici
+    # Converti i log in dizionari JSON-serializzabili per i grafici
     logs_json = []
     for log in all_logs:
         logs_json.append({
@@ -261,7 +261,7 @@ def logs():
             'user': log.user.username if log.user else None
         })
     
-    # 📋 Calcola conteggio per tipo di log per la legenda
+    # Calcola conteggio per tipo di log per la legenda
     from collections import Counter
     log_type_counts = Counter(log.type for log in all_logs)
     
@@ -408,7 +408,7 @@ def contatti():
         email = request.form.get('email', '')
         messaggio = request.form.get('messaggio', '')
         
-        # 🛡️ VALIDAZIONE COMPLETA di tutti i campi
+        # Validazione completa di tutti i campi
         fields_to_validate = {
             'nome': nome,
             'email': email,
@@ -428,7 +428,7 @@ def contatti():
                     attack_type = validation['attack_type']
                     attack_types.append(attack_type)
                     
-                    # 📝 LOG: Input malevolo rilevato
+                    # LOG: Input malevolo rilevato
                     create_log(
                         ip=request.remote_addr,
                         log_type=f"MALICIOUS_INPUT_{attack_type}",
@@ -442,7 +442,7 @@ def contatti():
             return render_template('contatti.html')
         
         # Se tutto ok, conferma invio (simulato)
-        # 📝 LOG: Messaggio di contatto inviato con successo
+        # LOG: Messaggio di contatto inviato con successo
         create_log(
             ip=request.remote_addr,
             log_type="CONTACT_FORM_SUCCESS",

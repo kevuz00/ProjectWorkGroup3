@@ -54,27 +54,43 @@ Flask-Bcrypt==1.0.1
 
 ## 🚀 Installazione e Avvio
 
-### 1. Attiva l'ambiente virtuale
+### 1. Clona il repository (o scarica il progetto)
+```bash
+git clone https://github.com/kevuz00/ProjectWorkGroup3.git
+cd ProjectWorkGroup3
+```
+
+### 2. Crea e attiva l'ambiente virtuale
 ```bash
 # Windows
+python -m venv .venv
 .venv\Scripts\activate
 
 # Linux/Mac
+python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Installa le dipendenze (se necessario)
+### 3. Installa le dipendenze
 ```bash
-pip install flask flask-login flask-sqlalchemy flask-bcrypt
+pip install -r requirements.txt
 ```
 
-### 3. Avvia l'applicazione
+### 4. Avvia l'applicazione
 ```bash
 python app.py
 ```
+> **Nota:** Il database viene creato automaticamente al primo avvio, insieme all'account admin!
 
-### 4. Accedi all'app
+### 5. Accedi all'app
 Apri il browser su: **http://127.0.0.1:5000**
+
+### 6. Login
+**Account Admin predefinito:**
+- Username: `admin`
+- Password: `Admin123!`
+
+**Oppure registra un nuovo account** dalla pagina `/register`
 
 ---
 
@@ -86,6 +102,7 @@ Apri il browser su: **http://127.0.0.1:5000**
 | id | Integer | Primary Key |
 | username | String(80) | Username univoco |
 | password | String(200) | Password hashata (bcrypt) |
+| is_admin | Boolean | Flag amministratore |
 | created_at | DateTime | Data registrazione |
 
 ### Tabella `logs`
@@ -110,34 +127,72 @@ L'applicazione logga automaticamente:
 | Login fallito | `LOGIN_FAILED` | ✅ True |
 | Registrazione | `REGISTER_SUCCESS` | ❌ False |
 | Logout | `LOGOUT` | ❌ False |
-| Accesso pagina home | `PAGE_ACCESS` | ❌ False |
-| Accesso pagina logs | `PAGE_ACCESS_LOGS` | ❌ False |
+| Cambio password OK | `PASSWORD_CHANGE_SUCCESS` | ❌ False |
+| Cambio password KO | `PASSWORD_CHANGE_FAILED` | ✅ True |
+| Account eliminato | `ACCOUNT_DELETED` | ❌ False |
+| Eliminazione KO | `ACCOUNT_DELETE_FAILED` | ✅ True |
+| Accesso home | `PAGE_ACCESS` | ❌ False |
+| Accesso logs | `PAGE_ACCESS_LOGS` | ❌ False |
+| Form contatto | `CONTACT_FORM_SUCCESS` | ❌ False |
+| SQL Injection | `MALICIOUS_INPUT_SQL_INJECTION` | ✅ True |
+| XSS | `MALICIOUS_INPUT_XSS` | ✅ True |
+| Command Injection | `MALICIOUS_INPUT_COMMAND_INJECTION` | ✅ True |
+| Path Traversal | `MALICIOUS_INPUT_PATH_TRAVERSAL` | ✅ True |
 
 ---
 
 ## 🎯 Funzionalità Principali
 
 ### 1. Autenticazione
-- ✅ Registrazione nuovi utenti
+- ✅ Registrazione nuovi utenti con validazione password
 - ✅ Login con username e password
 - ✅ Password hashate con bcrypt
 - ✅ Sessioni gestite con Flask-Login
 - ✅ Logout sicuro
+- ✅ Cambio password
+- ✅ Eliminazione account
 
 ### 2. Logging Automatico
 - ✅ Ogni evento viene salvato nel database
 - ✅ Tracciamento IP address
 - ✅ Timestamp preciso
 - ✅ Associazione con utente (quando applicabile)
+- ✅ 15+ tipi di eventi diversi
 
-### 3. Dashboard Log
-- ✅ Visualizzazione ultimi 100 eventi
+### 3. Dashboard Log (Solo Admin)
+- ✅ Visualizzazione ultimi 200 eventi
 - ✅ Statistiche in tempo reale:
   - Totale eventi
   - Login riusciti
   - Login falliti
   - Errori totali
-- ✅ Tabella interattiva con filtri visivi
+- ✅ **3 Grafici interattivi** (Chart.js):
+  - Distribuzione tipi di log (torta)
+  - Top 10 IP più attivi (barre)
+  - Attività per ora del giorno (linee)
+- ✅ **Filtri avanzati**:
+  - Per tipo evento
+  - Per IP address
+  - Per username
+  - Per data
+  - Solo errori/successi
+- ✅ **Legenda completa** tipi di log (espandibile)
+- ✅ **Sistema di alert automatici**:
+  - Brute force detection
+  - IP sospetti (troppi errori)
+  - Attacchi rilevati (SQL Injection, XSS, ecc.)
+
+### 4. Sicurezza Input
+- ✅ Rilevamento SQL Injection
+- ✅ Rilevamento XSS (Cross-Site Scripting)
+- ✅ Rilevamento Command Injection
+- ✅ Rilevamento Path Traversal
+- ✅ Tutti i tentativi di attacco vengono loggati
+
+### 5. E-commerce Fake
+- ✅ Homepage con 8 prodotti
+- ✅ Form contatto
+- ✅ Pagine privacy e termini
 
 ---
 
@@ -146,27 +201,31 @@ L'applicazione logga automaticamente:
 ### Implementato:
 ✅ Password hashate con bcrypt  
 ✅ Protezione route con `@login_required`  
-✅ Validazione form base  
+✅ Validazione input mallevoli (SQL Injection, XSS, Command Injection, Path Traversal)  
 ✅ Sessioni sicure Flask-Login  
-✅ Logging completo eventi
+✅ Logging completo eventi di sicurezza  
+✅ Dashboard con grafici (Chart.js)  
+✅ Sistema di alert automatici (brute force, IP sospetti)  
+✅ Filtri avanzati per log  
 
 ### Da Implementare (Future):
-⚠️ Rate limiting (protezione brute force)  
+⚠️ Rate limiting più aggressivo  
 ⚠️ HTTPS in produzione  
 ⚠️ CSRF protection  
-⚠️ Validazione avanzata con Pydantic  
-⚠️ Alert automatici su eventi sospetti  
-⚠️ Analisi pattern con ML  
+⚠️ Export log (CSV/JSON)  
+⚠️ Analisi predittiva con ML  
 
 ---
 
 ## 🛠️ Utility Scripts
 
-### Ricreare il Database
+### Ricreare il Database (opzionale)
 ```bash
 python recreate_db.py
 ```
-⚠️ **ATTENZIONE**: Questo elimina tutti i dati esistenti!
+⚠️ **ATTENZIONE**: Questo elimina tutti i dati esistenti e ricrea il database da zero!
+
+> **Nota:** Non necessario al primo avvio - il database viene creato automaticamente da `app.py`
 
 ---
 
@@ -177,9 +236,15 @@ python recreate_db.py
 | `/` | GET | Redirect a login o home | No |
 | `/login` | GET, POST | Pagina di login | No |
 | `/register` | GET, POST | Registrazione | No |
-| `/home` | GET | Pagina principale | ✅ Richiesta |
+| `/home` | GET | Pagina principale (e-shop) | No |
+| `/contact` | POST | Invio form contatto | No |
+| `/account` | GET | Gestione account utente | ✅ Richiesta |
+| `/account/change-password` | POST | Cambio password | ✅ Richiesta |
+| `/account/delete` | GET | Eliminazione account | ✅ Richiesta |
 | `/logout` | GET | Logout | ✅ Richiesta |
-| `/logs` | GET | Dashboard log | ✅ Richiesta |
+| `/logs` | GET | Dashboard log (ADMIN ONLY) | ✅ Richiesta + Admin |
+| `/privacy` | GET | Privacy policy | No |
+| `/terms` | GET | Termini e condizioni | No |
 
 ---
 
@@ -196,13 +261,12 @@ python recreate_db.py
 
 ## 📈 Prossimi Sviluppi
 
-- [ ] Implementare Pydantic per validazione
-- [ ] Aggiungere campo `severity` ai log (INFO, WARNING, CRITICAL)
-- [ ] Creare sistema di alert automatici
-- [ ] Implementare analisi brute-force detection
-- [ ] Dashboard con grafici temporali
 - [ ] Export log in CSV/JSON
 - [ ] API REST per integrazione esterna
+- [ ] Implementare CSRF protection
+- [ ] Dashboard utente (non-admin) con statistiche personali
+- [ ] Sistema di notifiche email per alert critici
+- [ ] Analisi predittiva con Machine Learning
 
 ---
 

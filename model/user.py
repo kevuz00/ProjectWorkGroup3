@@ -21,7 +21,7 @@ class User(UserMixin, db.Model):
 
 
 # -----------------------
-# 🔧 CRUD Operations
+# CRUD Operations
 # -----------------------
 
 def create_user(username, password, is_admin=False):

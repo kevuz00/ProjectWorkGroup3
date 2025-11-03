@@ -294,7 +294,7 @@
             color: var(--text, #e0e0e0);
         }
         
-        /* 🔍 STILI FILTRI */
+        /* STILI FILTRI */
         .filters-container {
             background: var(--card, #1e1e1e);
             border-radius: 12px;
@@ -420,7 +420,7 @@
             color: #ef4444;
         }
         
-        /* 📊 GRAFICI */
+        /* GRAFICI */
         .charts-section {
             margin: 30px 0;
         }
@@ -463,7 +463,7 @@
             }
         }
         
-        /* 📋 LEGENDA LOG TYPES */
+        /* LEGENDA LOG TYPES */
         .legend-section {
             margin: 30px 0;
         }
@@ -648,7 +648,7 @@
                 
                 <div class="legend-content" id="legendContent">
                     <div class="legend-body">
-                        <!-- 🔐 Autenticazione -->
+                        <!-- Autenticazione -->
                         <div class="legend-category">
                             <div class="legend-category-title">🔐 Autenticazione</div>
                             <div class="legend-items">
@@ -690,7 +690,7 @@
                             </div>
                         </div>
                         
-                        <!-- 👤 Gestione Account -->
+                        <!-- Gestione Account -->
                         <div class="legend-category">
                             <div class="legend-category-title">👤 Gestione Account</div>
                             <div class="legend-items">
@@ -732,7 +732,7 @@
                             </div>
                         </div>
                         
-                        <!-- 📄 Accesso Pagine -->
+                        <!-- Accesso Pagine -->
                         <div class="legend-category">
                             <div class="legend-category-title">📄 Accesso Pagine</div>
                             <div class="legend-items">
@@ -765,7 +765,7 @@
                             </div>
                         </div>
                         
-                        <!-- 🚨 Attacchi di Sicurezza -->
+                        <!-- Attacchi di Sicurezza -->
                         <div class="legend-category">
                             <div class="legend-category-title">🚨 Attacchi di Sicurezza Rilevati</div>
                             <div class="legend-items">
@@ -811,7 +811,7 @@
             </div>
         </div>
         
-        <!-- �🔍 FILTRI -->
+        <!-- FILTRI -->
         <div class="filters-container">
             <div class="filters-header">
                 <h3>🔍 Filtri Log</h3>
@@ -927,7 +927,7 @@
             {% endif %}
         </div>
         
-        <!-- 🚨 SEZIONE ALERT -->
+        <!-- SEZIONE ALERT -->
         <div class="alerts-section">
             {% if alerts.total_alerts > 0 %}
                 <!-- Alert Brute Force -->
@@ -971,7 +971,7 @@
                 </div>
                 {% endif %}
                 
-                <!-- 🛡️ Alert Attacchi Input Malevoli -->
+                <!-- Alert Attacchi Input Malevoli -->
                 {% if alerts.malicious_inputs %}
                 <div class="alert-box critical">
                     <div class="alert-header">
@@ -1081,7 +1081,7 @@
             </div>
         </div>
         
-        <!-- 📊 SEZIONE GRAFICI -->
+        <!-- SEZIONE GRAFICI -->
         <div class="charts-section">
             <div class="charts-grid">
                 <!-- Grafico: Distribuzione Tipi di Log -->
@@ -1159,7 +1159,7 @@
     </div>
     
     <script>
-        // 📊 CONFIGURAZIONE GLOBALE CHART.JS (Dark Theme)
+        // Configurazione globale Chart.js (Dark Theme)
         Chart.defaults.color = '#e0e0e0';
         Chart.defaults.borderColor = '#333';
         Chart.defaults.backgroundColor = 'rgba(245, 158, 11, 0.2)';
@@ -1167,7 +1167,7 @@
         // Prepara i dati dai log Flask (già serializzati in JSON)
         const logs = {{ logs_json | tojson | safe }};
         
-        // 1️⃣ GRAFICO: Distribuzione Tipi di Log (Pie Chart)
+        // Grafico: Distribuzione Tipi di Log (Pie Chart)
         const logTypeCount = {};
         logs.forEach(log => {
             logTypeCount[log.type] = (logTypeCount[log.type] || 0) + 1;
@@ -1218,7 +1218,7 @@
             }
         });
         
-        // 2️⃣ GRAFICO: Top 10 IP più Attivi (Horizontal Bar)
+        // Grafico: Top 10 IP più Attivi (Horizontal Bar)
         const ipCount = {};
         logs.forEach(log => {
             ipCount[log.ip] = (ipCount[log.ip] || 0) + 1;
@@ -1270,7 +1270,7 @@
             }
         });
         
-        // 3️⃣ GRAFICO: Attività per Ora del Giorno (Line Chart)
+        // Grafico: Attività per Ora del Giorno (Line Chart)
         const hourCount = Array(24).fill(0);
         logs.forEach(log => {
             const hour = new Date(log.timestamp).getHours();
@@ -1324,7 +1324,7 @@
             }
         });
         
-        // 📋 TOGGLE LEGENDA
+        // Toggle legenda
         function toggleLegend() {
             const content = document.getElementById('legendContent');
             const toggle = document.getElementById('legendToggle');
