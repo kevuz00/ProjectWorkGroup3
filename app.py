@@ -441,7 +441,7 @@ def contatti():
             flash('⚠️ Input sospetto rilevato. Messaggio bloccato per motivi di sicurezza.', 'error')
             return render_template('contatti.html')
         
-        # Se tutto ok, conferma invio (simulato)
+        # Se tutto ok, conferma invio
         # LOG: Messaggio di contatto inviato con successo
         create_log(
             ip=request.remote_addr,
