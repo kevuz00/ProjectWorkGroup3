@@ -112,7 +112,7 @@
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             
-            // Controlla ogni requisito
+            // Requisiti password
             updateReq(reqLength, password.length >= 8);
             updateReq(reqUppercase, /[A-Z]/.test(password));
             updateReq(reqLowercase, /[a-z]/.test(password));
